@@ -47,7 +47,7 @@ namespace DogApp
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "Error occurred while making the HTTP request to the Dog API.");
-                throw;  // or handle it differently based on your needs.
+                throw;  
             }
         }
 
