@@ -14,11 +14,18 @@ builder.Services.Configure<DogApiOptions>(builder.Configuration.GetSection("DogA
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy(
-        name: "AllowOrigin",
+    options.AddPolicy("Development",
         builder =>
         {
-            builder.WithOrigins("https://localhost:7244") // or whatever the client's origin is
+            builder.WithOrigins("https://localhost:7244")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+
+    options.AddPolicy("Production",
+        builder =>
+        {
+            builder.WithOrigins("https://white-ground-029633203.3.azurestaticapps.net")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
@@ -26,14 +33,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-app.UseCors("AllowOrigin");
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    
+    app.UseCors("Development");
+}
+else
+{
+    app.UseCors("Production");
 }
 
 app.UseHttpsRedirection();
