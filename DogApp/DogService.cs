@@ -58,8 +58,8 @@ namespace DogApp
                 var dogApiResponse = await response.Content.ReadFromJsonAsync<DogApiResponse>();
                 if (dogApiResponse == null)
                 {
-                    _logger.LogError("Received null from dog API response");
-                    throw new InvalidOperationException("Received null or empty message in dog API response");
+                    _logger.LogError("Failed to deserialize dog API response or received an empty response.");
+                    throw new InvalidOperationException("Failed to deserialize dog API response or received an empty response.");
                 }
 
                 if (dogApiResponse.Status != "success")
