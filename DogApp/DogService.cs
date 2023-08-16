@@ -34,7 +34,9 @@ namespace DogApp
         {
             try
             {
-                var response = await _httpClient.GetAsync(_options.Value.DogApiBaseUrl + _options.Value.RandomDogEndpoint);
+                var uri = ValidateAndBuildUri(_options.Value.DogApiBaseUrl, _options.Value.RandomDogEndpoint);
+
+                var response = await _httpClient.GetAsync(uri);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -50,6 +52,28 @@ namespace DogApp
                 throw;  
             }
         }
+
+        private Uri ValidateAndBuildUri(string baseUrl, string endpoint)
+        {
+            if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(endpoint))
+            {
+                _logger.LogError("Invalid configuration: Base URL or endpoint is null or empty.");
+                throw new InvalidOperationException("Invalid configuration: Base URL or endpoint is null or empty.");
+            }
+
+            UriBuilder uriBuilder = new UriBuilder(baseUrl);
+            uriBuilder.Path += endpoint;
+
+            Uri finalUri;
+            if (!Uri.TryCreate(uriBuilder.ToString(), UriKind.Absolute, out finalUri))
+            {
+                _logger.LogError("Invalid URI: {Uri}", uriBuilder.ToString());
+                throw new InvalidOperationException("Invalid URI.");
+            }
+
+            return finalUri;
+        }
+
 
         private async Task<DogApiResponse> ProcessDogApiResponseAsync(HttpResponseMessage response)
         {
