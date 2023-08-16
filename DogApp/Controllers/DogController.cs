@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DogApp.CustomException;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DogApp.Controllers
 {
@@ -25,6 +26,16 @@ namespace DogApp.Controllers
             {
                 var dog = await _dogService.GetRandomDogAsync();
                 return Ok(dog);
+            }
+            catch (HttpResponseException ex)
+            {
+                _logger.LogError(ex, $"An error occurred while retrieving a random dog. The Dog API responded with status code: {ex.StatusCode}");
+                return StatusCode((int)ex.StatusCode, new ProblemDetails
+                {
+                    Status = (int)ex.StatusCode,
+                    Title = $"{ex.StatusCode} Error",
+                    Detail = $"The Dog API responded with status code: {ex.StatusCode}"
+                });
             }
             catch (InvalidOperationException ex)
             {

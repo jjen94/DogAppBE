@@ -1,5 +1,5 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
+using DogApp.CustomException;
 using DogApp.DataObj;
 using Microsoft.Extensions.Options;
 
@@ -41,9 +41,8 @@ namespace DogApp
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError("Failed to get dog image with status code {StatusCode}", response.StatusCode);
-                    throw new InvalidOperationException("Failed to get dog image");
+                    throw new HttpResponseException(response.StatusCode);
                 }
-
                 return response;
             }
             catch (HttpRequestException ex)
